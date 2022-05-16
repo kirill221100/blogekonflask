@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Post {{post.id}} - Kapibu</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='/css/simple-blog-template.css')}}" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{url_for('index')}}">Kapibu</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a href="{{url_for('about')}}">About</a>
+            </li>
+
+            {% if not session.get('name')%}
+              <li>
+                <a href="{{url_for('login')}}">Login</a>
+              </li>
+              <li>
+                <a href="{{url_for('signup')}}">Sign up</a>
+              </li>
+            {% else %}
+              <li>
+                <a href="{{url_for('account')}}">Account</a>
+              </li>
+              <li>
+                <a href="{{url_for('newpost')}}">New post</a>
+              </li>
+              <li>
+                <a href="{{url_for('logout')}}">Logout</a>
+              </li>
+            {% endif%}
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container -->
+    </nav>
+
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Post Content Column -->
+        <div class="col-lg-12">
+
+          <!-- Blog Post -->
+
+          <!-- Title -->
+          <h1 class="post-title">{{post.title}}</h1>
+
+          <!-- Author -->
+          <p class="lead">
+            {% if post.user.avatar %}<img src="data:image/jpeg;base64,{{ post.user.avatar }}" alt="img_data"  id="imgslot" height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} by <a href="{{url_for('profile', name=post.user.name)}}">{{post.user.name}}</a>
+          </p>
+
+          <hr>
+
+          <!-- Date/Time -->
+          <p><span class="glyphicon glyphicon-time"></span> Posted on {{post.date}}</p>
+
+          <hr>
+
+          <!-- Post Content -->
+          <p>{{post.text}}</p>
+
+          <hr>
+
+          <!-- Blog Comments -->
+
+          <!-- Comments Form -->
+          <div class="well">
+            {% if session.get('name') %}
+              <h4>Leave a Comment:</h4>
+              <form action="" method="post" enctype="multipart/form-data">
+                {% with messages = get_flashed_messages() %}
+                   {% if messages %}
+                         {% for message in messages %}
+                              <p>{{ message }}</p>
+                         {% endfor %}
+                   {% endif %}
+                {% endwith %}
+                <div class="mt-2">
+                    <input class="btn btn-primary" type="file" id="img" name="img">
+                </div>
+                <div class="form-group">
+                  <textarea class="form-control" name="text" id="text" rows="3" required="required"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+            {% else%}
+              <h4>Register if you want to leave a comment.</h4>
+            {% endif%}
+          </div>
+
+          <hr>
+
+          <!-- Posted Comments -->
+          Hashtags: {{post.hashtags}}
+          <hr>
+          <!-- Comment -->
+          {% for i in post.comments%}
+            <div class="media">
+              <a class="pull-left" href="#">
+                <img class="media-object" src="http://placehold.it/64x64" alt="">
+              </a>
+
+              <div class="media-body">
+
+                <h4 class="media-heading">{% if i.user.avatar %}<img src="data:image/jpeg;base64,{{ i.user.avatar }}" alt="img_data"  id="imgslot" height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} <a href="{{url_for('profile', name=i.user.name)}}"> {{i.user.name}}</a>
+                  <small>{{i.date}}</small>
+                </h4>
+                {% if i.pic %}
+                  <img src="data:image/jpeg;base64,{{ i.pic }}" alt="img_data"  id="imgslot" height="20%" width="20%" />
+                {%endif%}
+                {{i.text}}
+              </div>
+            </div>
+            <hr size="4">
+          {% endfor%}
+
+          <!-- Comment -->
+
+
+        </div>
+      </div>
+      <!-- /.row -->
+
+    </div>
+    <!-- /.container -->
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <p>Copyright &copy; Bleba inc. 2022</p>
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+      </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='/js/jquery.js')}}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+
+  </body>
+
+</html>
