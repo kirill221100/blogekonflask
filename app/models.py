@@ -62,5 +62,6 @@ class Comment(db.Model):
     user = db.relationship('User', back_populates='comments')
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     post = db.relationship('Post', back_populates='comments')
+    is_answer = db.Column(db.Boolean)
     answers = db.relationship('Comment', remote_side=[comment_id])
 

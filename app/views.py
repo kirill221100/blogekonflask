@@ -20,6 +20,24 @@ def search():
         return render_template('search.html', posts=posts)
     return render_template('search.html')
 
+@app.route('/answer/<int:post_id>/<int:id_ans>', methods=["POST"])
+def answer(post_id, id_ans):
+    if not session.get('name'):
+        return redirect(url_for('login'))
+    comment = db.session.query(Comment).filter(Comment.id == id_ans).first()
+    user = db.session.query(User).filter(User.name == session['name']).first()
+    post = db.session.query(Post).filter(Post.id == post_id).first()
+    answer = Comment(user=user, is_answer=True, text=request.form['text'], post=post)
+    if request.files.get('img'):
+        if not request.files['img'].content_type == 'image/jpeg':
+            flash('This file is not jpg')
+            return redirect(url_for('post', id=post_id))
+        answer.pic = base64.b64encode(request.files['img'].read()).decode("utf-8")
+    db.session.add(answer)
+    comment.answers.append(answer)
+    db.session.commit()
+    return redirect(url_for('post', id=post_id))
+
 @app.route('/post/<int:id>', methods=['GET', 'POST'])
 def post(id):
     if request.method == 'POST':
