@@ -63,6 +63,8 @@ def answer(post_id, id_ans):
 
 @app.route('/post/<int:id>', methods=['GET', 'POST'])
 def post(id):
+    if not session.get('name'):
+        return redirect(url_for('login'))
     if request.method == 'POST':
         user = db.session.query(User).filter(User.name == session['name']).first()
         post = db.session.query(Post).filter(Post.id == id).first()
