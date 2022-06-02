@@ -101,6 +101,18 @@
 
           <!-- Post Content -->
           <p>{{post.text}}</p>
+          {% if post not in user.liked%}
+            <a href="{{url_for('rate', post_id=id, rating='like')}}"><img src="{{url_for('static', filename='like.png')}}" width="10%" style="filter: invert(50%);"></a>
+          {% else%}
+            <a href="{{url_for('rate', post_id=id, rating='remove_like')}}"><img src="{{url_for('static', filename='like.png')}}" width="10%"></a>
+          {% endif%}
+          {{ post.likes|count}}
+          {% if post not in user.disliked%}
+            <a href="{{url_for('rate', post_id=id, rating='dislike')}}"><img src="{{url_for('static', filename='dislike.png')}}" width="10%" style="filter: invert(50%);"></a>
+          {% else%}
+            <a href="{{url_for('rate', post_id=id, rating='remove_dislike')}}"><img src="{{url_for('static', filename='dislike.png')}}" width="10%"></a>
+          {% endif%}
+          {{ post.dislikes|count}}
 
           <hr>
 
@@ -134,8 +146,11 @@
           <hr>
 
           <!-- Posted Comments -->
-          Hashtags: {{post.hashtags}}
-          <hr>
+          {% if post.hashtags%}
+            Hashtags: {{post.hashtags}}
+            <hr>
+          {% endif%}
+
           <!-- Comment -->
           {% for i in post.comments%}
             {% if not i.is_answer%}

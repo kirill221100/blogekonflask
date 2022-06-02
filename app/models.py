@@ -7,6 +7,14 @@ from app.config import Config as cfg
 
 db = SQLAlchemy()
 
+posts_dislikes_assotiation = db.Table('posts_dislikes',
+                                      db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
+                                      db.Column("post_id", db.Integer, db.ForeignKey("post.id")))
+
+posts_likes_assotiation = db.Table('posts_likes',
+                                      db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
+                                      db.Column("post_id", db.Integer, db.ForeignKey("post.id")))
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
@@ -16,6 +24,8 @@ class User(db.Model):
     bio = db.Column(db.String)
     posts = db.relationship('Post', back_populates='user')
     comments = db.relationship('Comment', back_populates='user')
+    disliked = db.relationship("Post", secondary=posts_dislikes_assotiation, back_populates="dislikes")
+    liked = db.relationship("Post", secondary=posts_likes_assotiation, back_populates="likes")
 
     @property
     def password(self):
@@ -48,6 +58,8 @@ class Post(db.Model):
     text = db.Column(db.Text)
     date = db.Column(db.DateTime, default=datetime.utcnow)
     hashtags = db.Column(db.String)
+    dislikes = db.relationship("User", secondary=posts_dislikes_assotiation, back_populates="disliked")
+    likes = db.relationship("User", secondary=posts_likes_assotiation, back_populates="liked")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User', back_populates='posts')
     comments = db.relationship('Comment', back_populates='post')

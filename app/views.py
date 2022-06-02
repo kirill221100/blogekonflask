@@ -1,6 +1,6 @@
 from flask import session, redirect, request, url_for, render_template, flash
 from app.models import User, Post, Comment
-from app.email import send_password_reset_email
+from app.emails import send_password_reset_email
 from app import app, db
 import base64
 
@@ -12,6 +12,29 @@ def index():
     next_url = url_for('index', page=posts.next_num) if posts.has_next else None
     prev_url = url_for('index', page=posts.prev_num) if posts.has_prev else None
     return render_template('index.html', posts=list(posts.items), next_url=next_url, prev_url=prev_url)
+
+@app.route('/rate/<int:post_id>/<string:rating>')
+def rate(post_id, rating):
+    post = db.session.query(Post).filter(Post.id == post_id).first()
+    user = db.session.query(User).filter(User.name == session['name']).first()
+    if rating == 'like':
+        if user in post.dislikes:
+            post.dislikes.remove(user)
+        post.likes.append(user)
+
+    elif rating == 'dislike':
+        if user in post.likes:
+            post.likes.remove(user)
+        post.dislikes.append(user)
+
+    elif rating == 'remove_like':
+        post.likes.remove(user)
+
+    elif rating == 'remove_dislike':
+        post.dislikes.remove(user)
+
+    db.session.commit()
+    return redirect(url_for('post', id=post_id))
 
 @app.route('/search', methods=["GET", "POST"])
 def search():
@@ -52,7 +75,7 @@ def post(id):
         db.session.add(comment)
         db.session.commit()
         return redirect(url_for('post', id=id))
-    return render_template('post.html', post=db.session.query(Post).filter(Post.id == id).first())
+    return render_template('post.html', post=db.session.query(Post).filter(Post.id == id).first(), id=id, user=db.session.query(User).filter(User.name == session['name']).first())
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def newpost():

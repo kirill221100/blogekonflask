@@ -5207,6 +5207,10 @@ a.thumbnail.active {
 .media-body {
   width: 10000px;
 }
+.media-body-answer {
+  width: 10000px;
+  right: 1000px;
+}
 .media-object {
   display: block;
 }

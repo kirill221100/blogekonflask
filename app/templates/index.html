@@ -94,6 +94,12 @@
             <p>{{i.text[:100]}}...</p>
             <a class="btn btn-default" href="{{url_for('post', id=i.id)}}">Read More</a>
 
+
+            <img src="{{url_for('static', filename='like.png')}}" width="5%">
+            {{ i.likes|count}}
+            <img src="{{url_for('static', filename='dislike.png')}}" width="5%">
+
+            {{ i.dislikes|count}}
             <hr>
           {% endfor%}
           <!-- Second Blog Post -->
