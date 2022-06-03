@@ -89,6 +89,12 @@ def newpost():
                     user=db.session.query(User).filter(User.name == session.get('name')).first())
         if request.form['hashtags']:
             post.hashtags = request.form['hashtags'].strip()
+        if request.files.get('img'):
+            if not request.files['img'].content_type == 'image/jpeg':
+                flash('This file is not jpg')
+                return redirect(url_for('newpost'))
+            post.pic = base64.b64encode(request.files['img'].read()).decode("utf-8")
+
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('post', id=post.id))

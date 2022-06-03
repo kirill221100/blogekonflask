@@ -57,6 +57,7 @@ class Post(db.Model):
     title = db.Column(db.String)
     text = db.Column(db.Text)
     date = db.Column(db.DateTime, default=datetime.utcnow)
+    pic = db.Column(db.String)
     hashtags = db.Column(db.String)
     dislikes = db.relationship("User", secondary=posts_dislikes_assotiation, back_populates="disliked")
     likes = db.relationship("User", secondary=posts_likes_assotiation, back_populates="liked")

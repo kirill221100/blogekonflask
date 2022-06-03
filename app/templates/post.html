@@ -92,12 +92,12 @@
             {% if post.user.avatar %}<img src="data:image/jpeg;base64,{{ post.user.avatar }}" alt="img_data"  id="imgslot" height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} by <a href="{{url_for('profile', name=post.user.name)}}">{{post.user.name}}</a>
           </p>
 
-          <hr>
+
 
           <!-- Date/Time -->
           <p><span class="glyphicon glyphicon-time"></span> Posted on {{post.date}}</p>
 
-          <hr>
+          {% if post.pic%}<img src="data:image/jpeg;base64,{{ post.pic }}" alt="img_data"  id="imgslot" height="60%" width="60%"/>{%endif%}
 
           <!-- Post Content -->
           <p>{{post.text}}</p>

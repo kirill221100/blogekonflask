@@ -91,7 +91,12 @@
               {% if i.user.avatar %}<img src="data:image/jpeg;base64,{{ i.user.avatar }}" alt="img_data"  id="imgslot" height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} by <a href="{{url_for('profile', name=i.user.name)}}">{{i.user.name}}</a>
             </p>
             <p><span class="glyphicon glyphicon-time"></span> Posted on {{i.date}}</p>
+            {% if i.pic%}<img src="data:image/jpeg;base64,{{ i.pic }}" alt="img_data"  id="imgslot" height="50%" width="50%"/>{%endif%}
+          {% if i.text|count <= 100 %}
+            <p>{{i.text}}</p>
+          {% else %}
             <p>{{i.text[:100]}}...</p>
+          {%endif%}
             <a class="btn btn-default" href="{{url_for('post', id=i.id)}}">Read More</a>
 
 
