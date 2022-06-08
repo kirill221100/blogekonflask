@@ -89,7 +89,7 @@
 
           <!-- Author -->
           <p class="lead">
-            {% if post.user.avatar %}<img src="data:image/jpeg;base64,{{ post.user.avatar }}" alt="img_data"  id="imgslot" height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} by <a href="{{url_for('profile', name=post.user.name)}}">{{post.user.name}}</a>
+            {% if post.user.avatar_low %}<img src="data:image/jpeg;base64,{{ post.user.avatar_low }}" alt="img_data"  id="imgslot" height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} by <a href="{{url_for('profile', name=post.user.name)}}">{{post.user.name}}</a>
           </p>
 
 
@@ -97,7 +97,7 @@
           <!-- Date/Time -->
           <p><span class="glyphicon glyphicon-time"></span> Posted on {{post.date}}</p>
 
-          {% if post.pic%}<img src="data:image/jpeg;base64,{{ post.pic }}" alt="img_data"  id="imgslot" height="60%" width="60%"/>{%endif%}
+          {% if post.pic_low%}<a href="{{url_for('pic', pict=post.pic)}}"><img src="data:image/jpeg;base64,{{ post.pic_low }}" alt="img_data"  id="imgslot" height="60%" width="60%"/></a>{%endif%}
 
           <!-- Post Content -->
           <p>{{post.text}}</p>
@@ -155,17 +155,15 @@
           {% for i in post.comments%}
             {% if not i.is_answer%}
               <div class="media">
-                <a class="pull-left" href="#">
-                  <img class="media-object" src="http://placehold.it/64x64" alt="">
-                </a>
+
 
                 <div class="media-body">
 
-                  <h4 class="media-heading">{% if i.user.avatar %}<img src="data:image/jpeg;base64,{{ i.user.avatar }}" alt="img_data"  id="imgslot" height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} <a href="{{url_for('profile', name=i.user.name)}}"> {{i.user.name}}</a>
+                  <h4 class="media-heading">{% if i.user.avatar_low %}<img src="data:image/jpeg;base64,{{ i.user.avatar_low }}" alt="img_data"  id="imgslot" height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} <a href="{{url_for('profile', name=i.user.name)}}"> {{i.user.name}}</a>
                     <small>{{i.date}}</small> {% if session.get('name')%}<button id="btn" class="btn btn-primary">Answer</button>{%endif%}
                   </h4>
-                  {% if i.pic %}
-                    <img src="data:image/jpeg;base64,{{ i.pic }}" alt="img_data"  id="imgslot" height="20%" width="20%" />
+                  {% if i.pic_low %}
+                    <a href="{{ url_for('pic', pict=i.pic)}}"><img src="data:image/jpeg;base64,{{ i.pic_low }}" alt="img_data"  id="imgslot" height="20%" width="20%" /></a>
                   {%endif%}
                   {{i.text}}
                 </div>
@@ -189,13 +187,13 @@
               <hr size="4">
               {% if i.answers%}
                 {% for j in i.answers%}
-                  <div style="position: relative; right: -100px;">
+                  <div style="position: relative; right: -50px;">
 
-                    <h4 >{% if j.user.avatar %}<img src="data:image/jpeg;base64,{{ j.user.avatar }}" alt="img_data"  id="imgslot" height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} <a href="{{url_for('profile', name=j.user.name)}}"> {{j.user.name}}</a>
+                    <h4 >{% if j.user.avatar_low %}<img src="data:image/jpeg;base64,{{ j.user.avatar_low }}" alt="img_data"  id="imgslot" height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} <a href="{{url_for('profile', name=j.user.name)}}"> {{j.user.name}}</a>
                       <small>{{j.date}}</small>
                     </h4>
-                    {% if j.pic %}
-                      <img src="data:image/jpeg;base64,{{ j.pic }}" alt="img_data"  id="imgslot" height="20%" width="20%" />
+                    {% if j.pic_low %}
+                      <a href="{{url_for('pic', pict=j.pic)}}"><img src="data:image/jpeg;base64,{{ j.pic_low }}" alt="img_data"  id="imgslot" height="20%" width="20%" /></a>
                     {%endif%}
                     {{j.text}}
                   </div>

@@ -3,6 +3,8 @@ from app.models import User, Post, Comment
 from app.emails import send_password_reset_email
 from app import app, db
 import base64
+from PIL import Image
+from io import BytesIO
 
 
 @app.route('/')
@@ -56,6 +58,11 @@ def answer(post_id, id_ans):
             flash('This file is not jpg')
             return redirect(url_for('post', id=post_id))
         answer.pic = base64.b64encode(request.files['img'].read()).decode("utf-8")
+        by = BytesIO()
+        img = Image.open(request.files['img'].stream)
+        img.save(by, quality=35, format='JPEG')
+        answer.pic_low = base64.b64encode(by.getvalue()).decode('utf-8')
+
     db.session.add(answer)
     comment.answers.append(answer)
     db.session.commit()
@@ -74,6 +81,11 @@ def post(id):
                 flash('This file is not jpg')
                 return redirect(url_for('post', id=id))
             comment.pic = base64.b64encode(request.files['img'].read()).decode("utf-8")
+            by = BytesIO()
+            img = Image.open(request.files['img'].stream)
+            img.save(by, quality=35, format='JPEG')
+            comment.pic_low = base64.b64encode(by.getvalue()).decode('utf-8')
+
         db.session.add(comment)
         db.session.commit()
         return redirect(url_for('post', id=id))
@@ -94,7 +106,10 @@ def newpost():
                 flash('This file is not jpg')
                 return redirect(url_for('newpost'))
             post.pic = base64.b64encode(request.files['img'].read()).decode("utf-8")
-
+            by = BytesIO()
+            img = Image.open(request.files['img'].stream)
+            img.save(by, quality=35, format='JPEG')
+            post.pic_low = base64.b64encode(by.getvalue()).decode('utf-8')
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('post', id=post.id))
@@ -118,6 +133,10 @@ def account():
                 flash('This file is not jpg')
                 return redirect(url_for('account'))
             user.avatar = base64.b64encode(request.files['img'].read()).decode("utf-8")
+            by = BytesIO()
+            img = Image.open(request.files['img'].stream)
+            img.save(by, quality=10, format='JPEG')
+            user.avatar_low = base64.b64encode(by.getvalue()).decode('utf-8')
         if req.get('username'):
             if db.session.query(User).filter(User.name == req['username']).first():
                 flash('This username is registered')
@@ -210,4 +229,6 @@ def logout():
     session.pop('user_id')
     return redirect(url_for('login'))
 
-
+@app.route('/pic')
+def pic():
+    return render_template('pic.html', pict=request.args.get('pict'))

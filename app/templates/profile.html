@@ -74,8 +74,8 @@
     <div class="container">
 
 
-      {% if user.avatar %}
-        <img src="data:image/jpeg;base64,{{ user.avatar }}" alt="img_data"  id="imgslot" height="128px" width="128px"/>
+      {% if user.avatar_low %}
+      <a href="{{url_for('pic', pict=user.avatar)}}"><img src="data:image/jpeg;base64,{{ user.avatar_low }}" alt="img_data"  id="imgslot" height="128px" width="128px"/></a>
       {% else%}
         <img src="{{url_for('static', filename='profile.jpg')}}" height="128px" width="128px"/>
       {% endif%}
