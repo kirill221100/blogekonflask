@@ -97,7 +97,7 @@
           <!-- Date/Time -->
           <p><span class="glyphicon glyphicon-time"></span> Posted on {{post.date}}</p>
 
-          {% if post.pic_low%}<a href="{{url_for('pic', pict=post.pic)}}"><img src="data:image/jpeg;base64,{{ post.pic_low }}" alt="img_data"  id="imgslot" height="60%" width="60%"/></a>{%endif%}
+          {% if post.pic_low%}<a href="{{url_for('pic', pict=post.pic)}}"><img src="data:image/jpeg;base64,{{ post.pic_low }}" alt="img_data"  id="imgslot" width="250px"/></a>{%endif%}
 
           <!-- Post Content -->
           <p>{{post.text}}</p>
