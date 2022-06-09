@@ -88,10 +88,10 @@
               <a href="{{url_for('post', id=i.id)}}">{{i.title}}</a>
             </h2>
             <p class="lead">
-              {% if i.user.avatar_low %}<img src="data:image/jpeg;base64,{{ i.user.avatar_low }}" alt="img_data"   height="64px" width="64px"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} by <a href="{{url_for('profile', name=i.user.name)}}">{{i.user.name}}</a>
+              {% if i.user.avatar_low %}<img src="data:image/jpeg;base64,{{ i.user.avatar_low }}" alt="img_data"   height="64px" width="64px" loading="lazy"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} by <a href="{{url_for('profile', name=i.user.name)}}">{{i.user.name}}</a>
             </p>
             <p><span class="glyphicon glyphicon-time"></span> Posted on {{i.date}}</p>
-              {% if i.pic_low%}<a href="{{url_for('pic', pict=i.pic)}}"><img src="data:image/jpeg;base64,{{ i.pic_low }}" alt="img_data"  id="imgslot" height="250px"/></a>{%endif%}
+              {% if i.pic_low%}<a href="{{url_for('pic', pict=i.pic)}}"><img src="data:image/jpeg;base64,{{ i.pic_low }}" alt="img_data"  id="imgslot" height="250px" loading="lazy"/></a>{%endif%}
           {% if i.text|count <= 100 %}
             <p>{{i.text}}</p>
           {% else %}

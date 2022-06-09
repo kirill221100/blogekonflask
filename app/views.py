@@ -60,7 +60,7 @@ def answer(post_id, id_ans):
         answer.pic = base64.b64encode(request.files['img'].read()).decode("utf-8")
         by = BytesIO()
         img = Image.open(request.files['img'].stream)
-        img.save(by, quality=35, format='JPEG')
+        img.save(by, quality=35, format='JPEG', optimize=True)
         answer.pic_low = base64.b64encode(by.getvalue()).decode('utf-8')
 
     db.session.add(answer)
@@ -83,7 +83,7 @@ def post(id):
             comment.pic = base64.b64encode(request.files['img'].read()).decode("utf-8")
             by = BytesIO()
             img = Image.open(request.files['img'].stream)
-            img.save(by, quality=35, format='JPEG')
+            img.save(by, quality=35, format='JPEG', optimize=True)
             comment.pic_low = base64.b64encode(by.getvalue()).decode('utf-8')
 
         db.session.add(comment)
@@ -108,7 +108,7 @@ def newpost():
             post.pic = base64.b64encode(request.files['img'].read()).decode("utf-8")
             by = BytesIO()
             img = Image.open(request.files['img'].stream)
-            img.save(by, quality=35, format='JPEG')
+            img.save(by, quality=35, format='JPEG', optimize=True)
             post.pic_low = base64.b64encode(by.getvalue()).decode('utf-8')
         db.session.add(post)
         db.session.commit()
@@ -135,7 +135,7 @@ def account():
             user.avatar = base64.b64encode(request.files['img'].read()).decode("utf-8")
             by = BytesIO()
             img = Image.open(request.files['img'].stream)
-            img.save(by, quality=10, format='JPEG')
+            img.save(by, quality=10, format='JPEG', optimize=True)
             user.avatar_low = base64.b64encode(by.getvalue()).decode('utf-8')
         if req.get('username'):
             if db.session.query(User).filter(User.name == req['username']).first():
