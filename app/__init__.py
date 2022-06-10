@@ -16,4 +16,6 @@ migrate = Migrate(app, db)
 def create_tables():
     db.create_all()
 
+from app.api import *
+
 from app.views import *
