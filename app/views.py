@@ -135,6 +135,8 @@ def newpost():
 
 @app.route('/profile/<string:name>')
 def profile(name):
+    if not session.get('name'):
+        return redirect(url_for('login'))
     user = db.session.query(User).filter(User.name == name).first()
     user1 = db.session.query(User).filter(User.name == session['name']).first()
     posts = db.session.query(Post).join(User).filter(User.name == name).all()
