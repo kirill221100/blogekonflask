@@ -99,6 +99,14 @@
 
           {% if post.pic_low%}<a href="{{url_for('pic', pict=post.pic)}}"><img src="data:image/jpeg;base64,{{ post.pic_low }}" alt="img_data"  id="imgslot" width="250px" loading="lazy"/></a>{%endif%}
 
+          {% if user != post.user%}
+            {% if user not in post.user.followed_by %}
+              <a href="{{url_for('sub', user=user.name, user1=post.user.name, post_id=id)}}">subscribe</a>
+            {% else%}
+              <a href="{{url_for('unsub', user=user.name, user1=post.user.name, post_id=id)}}">unsubscribe</a>
+            {%endif%}
+          {%endif%}
+
           <!-- Post Content -->
           <p>{{post.text}}</p>
           {% if post not in user.liked%}

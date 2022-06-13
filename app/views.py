@@ -15,6 +15,17 @@ def index():
     prev_url = url_for('index', page=posts.prev_num) if posts.has_prev else None
     return render_template('index.html', posts=list(posts.items), next_url=next_url, prev_url=prev_url)
 
+@app.route('/subs')
+def subs():
+    if not session.get('name'):
+        return redirect(url_for('login'))
+    user = db.session.query(User).filter(User.name == session['name']).first()
+    page = request.args.get('page', 1, type=int)
+    posts = db.session.query(Post).join(User).order_by(Post.id.desc()).filter(User.followed_by.contains(user)).paginate(page, 3, False)
+    next_url = url_for('subs', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('subs', page=posts.prev_num) if posts.has_prev else None
+    return render_template('subs.html', posts=list(posts.items), next_url=next_url, prev_url=prev_url)
+
 @app.route('/rate/<int:post_id>/<string:rating>')
 def rate(post_id, rating):
     post = db.session.query(Post).filter(Post.id == post_id).first()
@@ -44,6 +55,13 @@ def search():
         posts = db.session.query(Post).filter(Post.hashtags.contains(request.form['search'].strip())).all()[::-1]
         return render_template('search.html', posts=posts)
     return render_template('search.html')
+
+@app.route('/search_users', methods=["GET", "POST"])
+def search_users():
+    if request.method == 'POST':
+        users = db.session.query(User).filter(User.name.contains(request.form['search'].strip())).all()
+        return render_template('search_users.html', users=users)
+    return render_template('search_users.html')
 
 @app.route('/answer/<int:post_id>/<int:id_ans>', methods=["POST"])
 def answer(post_id, id_ans):
@@ -118,8 +136,9 @@ def newpost():
 @app.route('/profile/<string:name>')
 def profile(name):
     user = db.session.query(User).filter(User.name == name).first()
+    user1 = db.session.query(User).filter(User.name == session['name']).first()
     posts = db.session.query(Post).join(User).filter(User.name == name).all()
-    return render_template('profile.html', user=user, posts=posts)
+    return render_template('profile.html', user=user, posts=posts, user1=user1, name=name)
 
 @app.route('/account', methods=['POST', 'GET'])
 def account():
@@ -232,3 +251,26 @@ def logout():
 @app.route('/pic')
 def pic():
     return render_template('pic.html', pict=request.args.get('pict'))
+
+@app.route('/sub/<user>/<user1>')
+def sub(user, user1):
+
+    usr = db.session.query(User).filter(User.name == user).first()
+    usr1 = db.session.query(User).filter(User.name == user1).first()
+    usr1.following.append(usr)
+    db.session.commit()
+    if request.args.get('post_id'):
+        return redirect(url_for('post', id=request.args.get('post_id')))
+    elif request.args.get('user_name'):
+        return redirect(url_for('profile', name=request.args.get('user_name')))
+
+@app.route('/unsub/<user>/<user1>')
+def unsub(user, user1):
+    usr = db.session.query(User).filter(User.name == user).first()
+    usr1 = db.session.query(User).filter(User.name == user1).first()
+    usr1.following.remove(usr)
+    db.session.commit()
+    if request.args.get('post_id'):
+        return redirect(url_for('post', id=request.args.get('post_id')))
+    elif request.args.get('user_name'):
+        return redirect(url_for('profile', name=request.args.get('user_name')))

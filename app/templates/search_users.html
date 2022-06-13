@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Home - Kapibu</title>
+    <title>Search users - Kapibu</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
@@ -82,31 +82,18 @@
         <div class="col-md-12">
 
           <!-- First Blog Post -->
-          <a href="{{url_for('search')}}">Search by hashtags</a>
-          <p><a href="{{url_for('search_users')}}">Search users</a></p>
-          <p><a href="{{url_for('subs')}}">Subscriptions</a></p>
-          {% for i in posts%}
-            <h2 class="post-title">
-              <a href="{{url_for('post', id=i.id)}}">{{i.title}}</a>
-            </h2>
-            <p class="lead">
-              {% if i.user.avatar_low %}<img src="data:image/jpeg;base64,{{ i.user.avatar_low }}" alt="img_data"   height="64px" width="64px" loading="lazy"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} by <a href="{{url_for('profile', name=i.user.name)}}">{{i.user.name}}</a>
+          <form action="" method="post">
+              <div class="form-group">
+                  <label for="search">Search users by name</label>
+                  <input type="text" class="form-control" name="search" id="search">
+              </div>
+          </form>
+          {% for i in users%}
+            <p>
+              {% if i.avatar_low %}<img src="data:image/jpeg;base64,{{ i.avatar_low }}" alt="img_data"   height="64px" width="64px" loading="lazy"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} <a href="{{url_for('profile', name=i.name)}}">{{i.name}}</a>
             </p>
-            <p><span class="glyphicon glyphicon-time"></span> Posted on {{i.date}}</p>
-              {% if i.pic_low%}<a href="{{url_for('pic', pict=i.pic)}}"><img src="data:image/jpeg;base64,{{ i.pic_low }}" alt="img_data"  id="imgslot" height="250px" loading="lazy"/></a>{%endif%}
-          {% if i.text|count <= 100 %}
-            <p>{{i.text}}</p>
-          {% else %}
-            <p>{{i.text[:100]}}...</p>
-          {%endif%}
-            <a class="btn btn-default" href="{{url_for('post', id=i.id)}}">Read More</a>
 
 
-            <img src="{{url_for('static', filename='like.png')}}" width="5%">
-            {{ i.likes|count}}
-            <img src="{{url_for('static', filename='dislike.png')}}" width="5%">
-
-            {{ i.dislikes|count}}
             <hr>
           {% endfor%}
           <!-- Second Blog Post -->

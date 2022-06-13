@@ -15,6 +15,10 @@ posts_likes_assotiation = db.Table('posts_likes',
                                       db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
                                       db.Column("post_id", db.Integer, db.ForeignKey("post.id")))
 
+user_to_user = db.Table('user_to_user',
+    db.Column("follower_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
+    db.Column("followed_id", db.Integer, db.ForeignKey("user.id"), primary_key=True)
+)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
@@ -27,7 +31,12 @@ class User(db.Model):
     comments = db.relationship('Comment', back_populates='user')
     disliked = db.relationship("Post", secondary=posts_dislikes_assotiation, back_populates="dislikes")
     liked = db.relationship("Post", secondary=posts_likes_assotiation, back_populates="likes")
-
+    following = db.relationship("User",
+                                secondary=user_to_user,
+                                primaryjoin=id == user_to_user.c.follower_id,
+                                secondaryjoin=id == user_to_user.c.followed_id,
+                                backref="followed_by"
+                                )
     @property
     def password(self):
         raise Exception('no')
