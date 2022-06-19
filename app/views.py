@@ -1,5 +1,5 @@
 from flask import session, redirect, request, url_for, render_template, flash
-from app.models import User, Post, Comment
+from app.models import User, Post, Comment, NotificPost, NotificComment
 from app.emails import send_password_reset_email
 from app import app, db
 import base64
@@ -9,11 +9,15 @@ from io import BytesIO
 
 @app.route('/')
 def index():
+    notifics = None
+    if session.get('name'):
+        user = db.session.query(User).filter(User.name == session['name']).first()
+        notifics = user.notific_num
     page = request.args.get('page', 1, type=int)
     posts = db.session.query(Post).order_by(Post.id.desc()).paginate(page, 3, False)
     next_url = url_for('index', page=posts.next_num) if posts.has_next else None
     prev_url = url_for('index', page=posts.prev_num) if posts.has_prev else None
-    return render_template('index.html', posts=list(posts.items), next_url=next_url, prev_url=prev_url)
+    return render_template('index.html', posts=list(posts.items), next_url=next_url, prev_url=prev_url, notifics=notifics)
 
 @app.route('/subs')
 def subs():
@@ -24,7 +28,7 @@ def subs():
     posts = db.session.query(Post).join(User).order_by(Post.id.desc()).filter(User.followed_by.contains(user)).paginate(page, 3, False)
     next_url = url_for('subs', page=posts.next_num) if posts.has_next else None
     prev_url = url_for('subs', page=posts.prev_num) if posts.has_prev else None
-    return render_template('subs.html', posts=list(posts.items), next_url=next_url, prev_url=prev_url)
+    return render_template('subs.html', posts=list(posts.items), next_url=next_url, prev_url=prev_url, user=user)
 
 @app.route('/rate/<int:post_id>/<string:rating>')
 def rate(post_id, rating):
@@ -51,17 +55,25 @@ def rate(post_id, rating):
 
 @app.route('/search', methods=["GET", "POST"])
 def search():
+    notifics = None
+    if session.get('name'):
+        user = db.session.query(User).filter(User.name == session['name']).first()
+        notifics = user.notific_num
     if request.method == 'POST':
         posts = db.session.query(Post).filter(Post.hashtags.contains(request.form['search'].strip())).all()[::-1]
-        return render_template('search.html', posts=posts)
-    return render_template('search.html')
+        return render_template('search.html', posts=posts, notifics=notifics)
+    return render_template('search.html', notifics=notifics)
 
 @app.route('/search_users', methods=["GET", "POST"])
 def search_users():
+    notifics = None
+    if session.get('name'):
+        user = db.session.query(User).filter(User.name == session['name']).first()
+        notifics = user.notific_num
     if request.method == 'POST':
         users = db.session.query(User).filter(User.name.contains(request.form['search'].strip())).all()
-        return render_template('search_users.html', users=users)
-    return render_template('search_users.html')
+        return render_template('search_users.html', users=users, notifics=notifics)
+    return render_template('search_users.html', notifics=notifics)
 
 @app.route('/answer/<int:post_id>/<int:id_ans>', methods=["POST"])
 def answer(post_id, id_ans):
@@ -80,7 +92,11 @@ def answer(post_id, id_ans):
         img = Image.open(request.files['img'].stream)
         img.save(by, quality=35, format='JPEG', optimize=True)
         answer.pic_low = base64.b64encode(by.getvalue()).decode('utf-8')
-
+    notific_com = NotificComment(post_id=post.id, user=comment.user,
+                                 text=f'{user.name} answered you')
+    comment.user.notific_num += 1
+    db.session.add(comment, notific_com)
+    notific_com.comment_id = comment.id
     db.session.add(answer)
     comment.answers.append(answer)
     db.session.commit()
@@ -103,8 +119,10 @@ def post(id):
             img = Image.open(request.files['img'].stream)
             img.save(by, quality=35, format='JPEG', optimize=True)
             comment.pic_low = base64.b64encode(by.getvalue()).decode('utf-8')
-
-        db.session.add(comment)
+        notific_com = NotificComment(post_id=id, comment_id=comment.id, user=post.user, text=f'New comment from {user.name}')
+        post.user.notific_num += 1
+        db.session.add(comment, notific_com)
+        notific_com.comment_id = comment.id
         db.session.commit()
         return redirect(url_for('post', id=id))
     return render_template('post.html', post=db.session.query(Post).filter(Post.id == id).first(), id=id, user=db.session.query(User).filter(User.name == session['name']).first())
@@ -114,6 +132,7 @@ def newpost():
     if not session.get('name'):
         return redirect(url_for('login'))
     if request.method == 'POST':
+        user = db.session.query(User).filter(User.name == session.get('name')).first()
         post = Post(title=request.form['subject'],
                     text=request.form['content'],
                     user=db.session.query(User).filter(User.name == session.get('name')).first())
@@ -129,9 +148,15 @@ def newpost():
             img.save(by, quality=35, format='JPEG', optimize=True)
             post.pic_low = base64.b64encode(by.getvalue()).decode('utf-8')
         db.session.add(post)
+        if user.followed_by:
+            notific_post = NotificPost(post_id=post.id, text=f'{user.name} created post')
+            db.session.add(notific_post)
+            for i in user.followed_by:
+                i.notific_num += 1
+                i.notific_posts.append(notific_post)
         db.session.commit()
         return redirect(url_for('post', id=post.id))
-    return render_template('newpost.html')
+    return render_template('newpost.html', notifics=db.session.query(User).filter(User.name == session.get('name')).first().notific_num)
 
 @app.route('/profile/<string:name>')
 def profile(name):
@@ -141,6 +166,15 @@ def profile(name):
     user1 = db.session.query(User).filter(User.name == session['name']).first()
     posts = db.session.query(Post).join(User).filter(User.name == name).all()
     return render_template('profile.html', user=user, posts=posts, user1=user1, name=name)
+
+@app.route('/notific')
+def notific():
+    if not session.get('name'):
+        return redirect(url_for('login'))
+    user = db.session.query(User).filter(User.name == session.get('name')).first()
+    user.notific_num = 0
+    db.session.commit()
+    return render_template('notific.html', user=user)
 
 @app.route('/account', methods=['POST', 'GET'])
 def account():

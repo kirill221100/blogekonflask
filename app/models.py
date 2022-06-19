@@ -15,6 +15,11 @@ posts_likes_assotiation = db.Table('posts_likes',
                                       db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
                                       db.Column("post_id", db.Integer, db.ForeignKey("post.id")))
 
+notific_posts_assotiation = db.Table('notific_posts_ass',
+                                      db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
+                                      db.Column("notific_post_id", db.Integer, db.ForeignKey("notificpost.id")))
+
+
 user_to_user = db.Table('user_to_user',
     db.Column("follower_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
     db.Column("followed_id", db.Integer, db.ForeignKey("user.id"), primary_key=True)
@@ -31,6 +36,9 @@ class User(db.Model):
     comments = db.relationship('Comment', back_populates='user')
     disliked = db.relationship("Post", secondary=posts_dislikes_assotiation, back_populates="dislikes")
     liked = db.relationship("Post", secondary=posts_likes_assotiation, back_populates="likes")
+    notific_num = db.Column(db.Integer, default=0)
+    notific_posts = db.relationship('NotificPost', secondary=notific_posts_assotiation, back_populates='users')
+    notific_comments = db.relationship('NotificComment', back_populates='user')
     following = db.relationship("User",
                                 secondary=user_to_user,
                                 primaryjoin=id == user_to_user.c.follower_id,
@@ -90,3 +98,19 @@ class Comment(db.Model):
     is_answer = db.Column(db.Boolean)
     answers = db.relationship('Comment', remote_side=[comment_id])
 
+class NotificPost(db.Model):
+    __tablename__ = 'notificpost'
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer)
+    text = db.Column(db.Text)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    users = db.relationship('User', secondary=notific_posts_assotiation, back_populates='notific_posts')
+
+class NotificComment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer)
+    comment_id = db.Column(db.Integer)
+    text = db.Column(db.Text)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User', back_populates='notific_comments')

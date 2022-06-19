@@ -56,11 +56,17 @@
                 <a href="{{url_for('signup')}}">Sign up</a>
               </li>
             {% else %}
+            <li>
+                <a href="{{url_for('account')}}">Account</a>
+              </li>
               <li>
                 <a href="{{url_for('logout')}}">Logout</a>
               </li>
               <li>
                 <a href="{{url_for('newpost')}}">New post</a>
+              </li>
+              <li>
+                <a href="{{url_for('notific')}}">{{user1.notific_num}}</a>
               </li>
             {% endif%}
           </ul>

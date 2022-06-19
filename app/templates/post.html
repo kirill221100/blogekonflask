@@ -65,6 +65,9 @@
               <li>
                 <a href="{{url_for('logout')}}">Logout</a>
               </li>
+              <li>
+                <a href="{{url_for('notific')}}">{{user.notific_num}}</a>
+              </li>
             {% endif%}
           </ul>
         </div>
@@ -167,7 +170,7 @@
 
                 <div class="media-body">
 
-                  <h4 class="media-heading">{% if i.user.avatar_low %}<img src="data:image/jpeg;base64,{{ i.user.avatar_low }}" alt="img_data"  id="imgslot" height="64px" width="64px" loading="lazy"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} <a href="{{url_for('profile', name=i.user.name)}}"> {{i.user.name}}</a>
+                  <h4 class="media-heading" id="{{i.id}}">{% if i.user.avatar_low %}<img src="data:image/jpeg;base64,{{ i.user.avatar_low }}" alt="img_data"  id="imgslot" height="64px" width="64px" loading="lazy"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} <a href="{{url_for('profile', name=i.user.name)}}"> {{i.user.name}}</a>
                     <small>{{i.date}}</small> {% if session.get('name')%}<button id="btn" class="btn btn-primary">Answer</button>{%endif%}
                   </h4>
                   {% if i.pic_low %}

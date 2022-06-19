@@ -62,12 +62,8 @@
               <li>
                 <a href="{{url_for('logout')}}">Logout</a>
               </li>
-
               <li>
                 <a href="{{url_for('newpost')}}">New post</a>
-              </li>
-              <li>
-                <a href="{{url_for('notific')}}">{{notifics}}</a>
               </li>
             {% endif%}
           </ul>
@@ -86,49 +82,18 @@
         <div class="col-md-12">
 
           <!-- First Blog Post -->
-          <a href="{{url_for('search')}}">Search by hashtags</a>
-          <p><a href="{{url_for('search_users')}}">Search users</a></p>
-          <p><a href="{{url_for('subs')}}">Subscriptions</a></p>
-          {% for i in posts%}
-            <h2 class="post-title">
-              <a href="{{url_for('post', id=i.id)}}">{{i.title}}</a>
-            </h2>
-            <p class="lead">
-              {% if i.user.avatar_low %}<img src="data:image/jpeg;base64,{{ i.user.avatar_low }}" alt="img_data"   height="64px" width="64px" loading="lazy"/>{%else%}<img src="{{url_for('static', filename='profile.jpg')}}" height="64px" width="64px"/>{% endif%} by <a href="{{url_for('profile', name=i.user.name)}}">{{i.user.name}}</a>
-            </p>
-            <p><span class="glyphicon glyphicon-time"></span> Posted on {{i.date}}</p>
-              {% if i.pic_low%}<a href="{{url_for('pic', pict=i.pic)}}"><img src="data:image/jpeg;base64,{{ i.pic_low }}" alt="img_data"  id="imgslot" height="250px" loading="lazy"/></a>{%endif%}
-          {% if i.text|count <= 100 %}
-            <p>{{i.text}}</p>
-          {% else %}
-            <p>{{i.text[:100]}}...</p>
-          {%endif%}
-            <a class="btn btn-default" href="{{url_for('post', id=i.id)}}">Read More</a>
 
-
-            <img src="{{url_for('static', filename='like.png')}}" width="5%">
-            {{ i.likes|count}}
-            <img src="{{url_for('static', filename='dislike.png')}}" width="5%">
-
-            {{ i.dislikes|count}}
-            <hr>
+          {% for i in user.notific_posts[::-1]%}
+            <p>{{i.text}} <a href="{{url_for('post', id=i.post_id)}}">link</a> {{i.date}}</p>
+          {% endfor%}
+          {% for i in user.notific_comments[::-1]%}
+            <p>{{i.text}} <a href="{{url_for('post', id=i.post_id)+'#'+i.comment_id|string}}">link</a> {{i.date}}</p>
           {% endfor%}
           <!-- Second Blog Post -->
 
 
           <!-- Pager -->
-          <ul class="pager">
-            {% if prev_url%}
-              <li class="previous">
-                <a href="{{prev_url}}">Prev</a>
-              </li>
-            {%endif%}
-            {% if next_url%}
-              <li class="next">
-                <a href="{{next_url}}">Next</a>
-              </li>
-            {% endif%}
-          </ul>
+
 
         </div>
 
